@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
 use Foamycastle\Util\Validator\Validator;
-use Foamycastle\Util\example\HexValidator;
+use Foamycastle\Util\Validator\HexValidator;
 
 //Register an object that extends the Validator base class
 Validator::Register(HexValidator::class);

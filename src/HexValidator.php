@@ -1,8 +1,7 @@
 <?php
 
-namespace Foamycastle\Util\example;
+namespace Foamycastle\Util\Validator;
 
-use Foamycastle\Util\Validator\Validator;
 
 class HexValidator extends Validator
 {
