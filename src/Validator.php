@@ -83,7 +83,7 @@ abstract class Validator
         if(!self::isRegistered($name) && !self::isUnresolved($name)) {
             $buildClassName=__NAMESPACE__."\\".ucfirst($name);
             if(class_exists($buildClassName)) {
-                self::Add($name,$buildClassName);
+                self::Register($name,$buildClassName);
                 self::resolveValidator($name);
             }else{
                 throw new \Exception("Validator '$name' does not exist");
@@ -98,7 +98,7 @@ abstract class Validator
     {
         self::registerValidator($name,$callable);
     }
-    public static function Add(string $className,string $name=''):void
+    public static function Register(string $className,string $name=''):void
     {
         $name=$name==''
             ? substr($className,strrpos($className,'\\')+1)
