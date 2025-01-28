@@ -8,9 +8,9 @@ abstract class Validator
 
     /**
      * Used for creating tests from closures
-     * @var AdhocValidator $callableValidator
+     * @var callable $callableValidator
      */
-    protected AdhocValidator $callableValidator;
+    protected $callableValidator;
     /**
      * A list of registered validation objects.
      * @var array<string,Validator>
