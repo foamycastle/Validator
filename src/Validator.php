@@ -80,15 +80,6 @@ abstract class Validator
         if(self::isUnresolved($name)) {
             self::resolveValidator($name);
         }
-        if(!self::isRegistered($name) && !self::isUnresolved($name)) {
-            $buildClassName=__NAMESPACE__."\\".ucfirst($name);
-            if(class_exists($buildClassName)) {
-                self::Register($name,$buildClassName);
-                self::resolveValidator($name);
-            }else{
-                throw new \Exception("Validator '$name' does not exist");
-            }
-        }
         if(!self::isRegistered($name)) {
             throw new \Exception("Validator '$name' has not been registered");
         }
