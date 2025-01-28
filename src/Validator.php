@@ -32,10 +32,23 @@ abstract class Validator
     {
         return isset(self::$registeredValidators[$name]);
     }
+
+    /**
+     * Indicate that a given validator class has not been resolved
+     * @param string $name
+     * @return bool
+     */
     protected static function isUnresolved(string $name): bool
     {
         return isset(self::$unresolvedValidators[$name]);
     }
+
+    /**
+     * Resolve the Validator class
+     * @param string $name the name by which the Validator will be referenced
+     * @return Validator
+     * @throws \Exception
+     */
     protected static function resolveValidator(string $name): Validator
     {
 
@@ -55,12 +68,26 @@ abstract class Validator
         }
         return $validator;
     }
+
+    /**
+     * Remove an Validator class from the unresolved list
+     * @param string $name
+     * @return void
+     */
     private static function removeUnresolvedValidator(string $name): void
     {
         if(self::isUnresolved($name)) {
             unset(self::$unresolvedValidators[$name]);
         }
     }
+
+    /**
+     * Register a Validator class
+     * @param string $name the name by which the Validator will be referenced
+     * @param callable $validator the invokable class or callable function that will perform the test
+     * @return void
+     * @throws \Exception If the $name argument has already been registered
+     */
     protected static function registerValidator(string $name, callable $validator): void
     {
         if(self::isRegistered($name)) {
@@ -68,6 +95,12 @@ abstract class Validator
         }
         self::$registeredValidators[$name] = $validator;
     }
+
+    /**
+     * Unregister a Validator object
+     * @param string $name the name by which the Validator is referenced
+     * @return void
+     */
     protected static function unregisterValidator(string $name): void
     {
         if(!self::isRegistered($name)) {
@@ -75,6 +108,14 @@ abstract class Validator
         }
         unset(self::$registeredValidators[$name]);
     }
+
+    /**
+     * Allow Validator objects to be access by their registered names
+     * @param string $name
+     * @param array $arguments the data to be tested
+     * @return bool TRUE if the validation passed
+     * @throws \Exception if the $name argument has not been registered
+     */
     public static function __callStatic(string $name, array $arguments):bool
     {
         if(self::isUnresolved($name)) {
@@ -85,10 +126,26 @@ abstract class Validator
         }
         return self::$registeredValidators[$name](...$arguments);
     }
+
+    /**
+     * Create a validator from a lambda function or Closure
+     * @param string $name
+     * @param callable $callable
+     * @return void
+     * @throws \Exception
+     */
     public static function From(string $name,callable $callable):void
     {
         self::registerValidator($name,$callable);
     }
+
+    /**
+     * Add a classname to the list of Validator classes to be registered
+     * @param string $className
+     * @param string $name
+     * @return void
+     * @throws \Exception
+     */
     public static function Register(string $className,string $name=''):void
     {
         $name=$name==''
