@@ -30,7 +30,7 @@ abstract class Validator
     }
 
     /**
-     * Register a Validator class
+     * Register a Validator function or class
      * @param string $name the name by which the Validator will be referenced
      * @param callable $validator the invokable class or callable function that will perform the test
      * @return void
