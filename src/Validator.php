@@ -20,12 +20,6 @@ abstract class Validator
     private static array $registeredValidators = [];
 
     /**
-     * A list of validation objects that have yet to be resolved
-     * @var array<string,class-string>
-     */
-    private static array $unresolvedValidators = [];
-
-    /**
      * Indicate if a given name has a validator object registered to it.
      * @param string $name
      * @return bool
@@ -36,64 +30,16 @@ abstract class Validator
     }
 
     /**
-     * Indicate that a given validator class has not been resolved
-     * @param string $name
-     * @return bool
-     */
-    protected static function isUnresolved(string $name): bool
-    {
-        return isset(self::$unresolvedValidators[$name]);
-    }
-
-    /**
-     * Resolve the Validator class
-     * @param string $name the name by which the Validator will be referenced
-     * @return Validator
-     * @throws \Exception
-     */
-    protected static function resolveValidator(string $name): Validator
-    {
-
-        if (!self::isUnresolved($name)) {
-            throw new \Exception("Validator '$name' has not been added");
-        }
-        if(self::isRegistered($name)) {
-            return self::$registeredValidators[$name];
-        }
-        $classString = self::$unresolvedValidators[$name];
-        if(!class_exists($classString)) {
-            throw new \Exception("Validator '$name' does not exist");
-        }
-        $validator = new $classString($name);
-        if(!($validator instanceof Validator)) {
-            throw new \Exception("Validator '$name' does not descend from Validator");
-        }
-        return $validator;
-    }
-
-    /**
-     * Remove an Validator class from the unresolved list
-     * @param string $name
-     * @return void
-     */
-    private static function removeUnresolvedValidator(string $name): void
-    {
-        if(self::isUnresolved($name)) {
-            unset(self::$unresolvedValidators[$name]);
-        }
-    }
-
-    /**
      * Register a Validator class
      * @param string $name the name by which the Validator will be referenced
      * @param callable $validator the invokable class or callable function that will perform the test
      * @return void
-     * @throws \Exception If the $name argument has already been registered
+     * @throws Exception If the $name argument has already been registered
      */
     protected static function registerValidator(string $name, callable $validator): void
     {
         if(self::isRegistered($name)) {
-            throw new \Exception("Validator '$name' has already been registered");
+            throw new Exception("Validator '$name' has already been registered");
         }
         self::$registeredValidators[$name] = $validator;
     }
@@ -116,15 +62,12 @@ abstract class Validator
      * @param string $name
      * @param array $arguments the data to be tested
      * @return bool TRUE if the validation passed
-     * @throws \Exception if the $name argument has not been registered
+     * @throws Exception if the $name argument has not been registered
      */
     public static function __callStatic(string $name, array $arguments):bool
     {
-        if(self::isUnresolved($name)) {
-            self::resolveValidator($name);
-        }
         if(!self::isRegistered($name)) {
-            throw new \Exception("Validator '$name' has not been registered");
+            throw new Exception("Validator '$name' has not been registered");
         }
         return self::$registeredValidators[$name](...$arguments);
     }
@@ -134,7 +77,7 @@ abstract class Validator
      * @param string $name
      * @param callable $callable
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public static function From(string $name,callable $callable):void
     {
@@ -146,7 +89,7 @@ abstract class Validator
      * @param string $className
      * @param string $name
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public static function Register(string $className,string $name=''):void
     {
@@ -154,12 +97,19 @@ abstract class Validator
             ? substr($className,strrpos($className,'\\')+1)
             : $name;
         if(!class_exists($className)) {
-            throw new \Exception("Validator '$name' does not exist");
+            throw new Exception("Validator '$name' does not exist");
         }
-        self::$unresolvedValidators[$name] = $className;
+        self::$registeredValidators[$name]=new $className(...$args);
     }
 
-    public function __construct(string $name='')
+    public static function Unregister(string $name):void
+    {
+        if(self::isRegistered($name)) {
+            unset(self::$registeredValidators[$name]);
+        }
+    }
+
+    public function __construct()
     {
         $this->name = $name==''
             ? substr(static::class, strrpos(static::class, '\\')+1)
