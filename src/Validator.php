@@ -91,11 +91,9 @@ abstract class Validator
      * @return void
      * @throws Exception
      */
-    public static function Register(string $className,string $name=''):void
+    public static function Register(string $className, ...$args):void
     {
-        $name=$name==''
-            ? substr($className,strrpos($className,'\\')+1)
-            : $name;
+        $name=substr($className,strrpos($className,'\\')+1);
         if(!class_exists($className)) {
             throw new Exception("Validator '$name' does not exist");
         }
@@ -111,10 +109,7 @@ abstract class Validator
 
     public function __construct()
     {
-        $this->name = $name==''
-            ? substr(static::class, strrpos(static::class, '\\')+1)
-            : $name;
-        self::registerValidator($this->name,$this);
+        $this->name = substr(static::class, strrpos(static::class, '\\')+1);
     }
     public function __destruct()
     {
