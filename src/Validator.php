@@ -2,6 +2,8 @@
 
 namespace Foamycastle\Util\Validator;
 
+use Exception;
+
 abstract class Validator
 {
     protected string $name;
