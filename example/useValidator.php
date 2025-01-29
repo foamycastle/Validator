@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../vendor/autoload.php';
+
+use Foamycastle\Util\Validator\CharCount;
 use Foamycastle\Util\Validator\Validator;
 use Foamycastle\Util\Validator\HexValidator;
 
@@ -7,9 +9,11 @@ use Foamycastle\Util\Validator\HexValidator;
 Validator::Register(HexValidator::class);
 echo Validator::HexValidator('7dddf7e') ? "VALID HEX\n": "NOT VALID HEX\n";
 
-//Optionally name the registration or default to using the class name
-Validator::Register(HexValidator::class,"ValidHex");
-echo Validator::ValidHex('7dddf7e') ? "VALID HEX\n": "NOT VALID HEX\n";
+//Optionally pass arguments to the Validator constructor.
+//The CharCount Validator indicates that the tested string
+//has less than the specified number of characters.
+Validator::Register(CharCount::class,32);
+echo Validator::CharCount('7dddf7e') ? "VALID CHARCOUNT\n": "INVALID CHARCOUNT\n";
 
 //use a callable to enjoy access to a specific scope
 //using the ::From method requires a name argument
